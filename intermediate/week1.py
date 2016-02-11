@@ -15,6 +15,17 @@ class Hour(object):
         """
         return str(self.hour) + ":" + str(self.minutes) + ":" + str(self.seconds)
 
+    @property
+    def value(self):
+        """
+        Returns the value of the hour in number.
+        """
+        r = 0
+        r += (int(self.hour) * 10000)
+        r += (int(self.minutes) * 100)
+        r += (int(self.seconds))
+        return r
+
 class Event():
     """
     Simple event object.
@@ -28,8 +39,15 @@ class Event():
 
     @property
     def show(self):
-       return self.hour.moment() + "   " + self.name + "\n" + self.description + "\n"
-        
+        return self.hour.moment() + "   " + self.name + "\n" + self.description + "\n"
+
+    @property
+    def value(self): 
+        """
+        Returns the value of the hour in number.
+        """
+        return self.hour.value
+
 class Scheduler(object):
     """
     Simple scheduler.
@@ -43,9 +61,10 @@ class Scheduler(object):
         Schedule some event.
         """
         event = Event(name, hour, description)
-        self.count += 1
         self.events[self.count] = event
-        print("Event: " + str(self.count) + "  " + str(event.show))
+        self.count += 1
+        self._sort()
+        print("Event: " + "  " + str(event.show))
         return
 
     def cancel(self, name):
@@ -65,6 +84,22 @@ class Scheduler(object):
         for each in list(self.events.keys()):
             r += str(each) + "   " + self.events[each].show + "\n"
         return r
+
+    def _sort(self):
+        """
+        Correct the order of events
+        """
+        l = len(list(self.events.keys()))
+        aux = None
+        swapped = True
+        while swapped:
+            swapped = False
+            for n in range(1, l):
+                if self.events[n-1].value > self.events[n].value:
+                    aux = self.events[n-1]
+                    self.events[n-1] = self.events[n]
+                    self.events[n] = aux
+                    swapped = True
 
 def menu():
     op = -1
